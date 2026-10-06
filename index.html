@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mwala AI - Video Generator</title>
+<style>
+body{background:#111;color:white;font-family:sans-serif;text-align:center;padding:20px;margin:0}
+h1{color:#ff3b30;font-size:28px}
+input,textarea,select{width:100%;max-width:400px;padding:14px;margin:10px 0;border-radius:12px;border:none;background:#2a2a2a;color:white;box-sizing:border-box;font-size:16px}
+button{background:#ff3b30;color:white;padding:15px 30px;border:none;border-radius:30px;font-size:18px;font-weight:bold;margin-top:15px;cursor:pointer;width:100%;max-width:400px}
+#resultArea{margin-top:25px;padding:15px;background:#1a1a1a;border-radius:12px;max-width:400px;margin-left:auto;margin-right:auto}
+small{color:#888}
+</style>
+</head>
+<body>
+<h1>🔥 Mwala AI</h1>
+<p>Malawi's First AI Video Generator</p>
+
+<input type="password" id="hfToken" placeholder="Paste your HuggingFace token (hf_...)" >
+<br>
+<textarea id="songInput" rows="3" placeholder="e.g. Amapiano love song in Lilongwe at sunset"></textarea>
+<br>
+<select id="styleSelect">
+<option>Amapiano Vibe</option>
+<option>Afro Fusion</option>
+<option>Gospel Malawi</option>
+<option>Hip Hop</option>
+</select>
+<br>
+<button onclick="generateVideo()">Generate AI Video</button>
+
+<div id="resultArea">Your AI video will appear here...</div>
+
+<script src="script.js"></script>
+</body>
+</html>
