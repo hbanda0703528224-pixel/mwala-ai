@@ -1,51 +1,53 @@
-const HF_TOKEN = "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";
-
 async function generateVideo() {
   const song = document.getElementById('songInput').value;
   const style = document.getElementById('styleSelect').value;
+  const tokenInput = document.getElementById('hfToken').value.trim();
   const resultArea = document.getElementById('resultArea');
 
   if (!song) {
-    alert('Please enter song idea first!');
+    alert('Please enter song idea!');
+    return;
+  }
+  if (!tokenInput || !tokenInput.startsWith('hf_')) {
+    alert('Please paste your NEW HuggingFace token! Get it from hf.co/settings/tokens');
     return;
   }
 
-  resultArea.innerHTML = `<p>⏳ Mwala AI is creating real AI video for: "${song}"...<br>Wait 30-60 seconds (AI is thinking)...</p>`;
+  // Save token locally so user doesn't type every time
+  localStorage.setItem('hf_token', tokenInput);
+  const HF_TOKEN = tokenInput;
 
-  // Use Free AI Model for Text-to-Image + Video Effect
-  const prompt = `${song}, ${style} style, afro music video, high quality, cinematic lighting, malawian artist`;
+  resultArea.innerHTML = `<p>⏳ Mwala AI is creating for: "${song}"...<br>Wait 40 seconds...</p>`;
+
+  const prompt = `${song}, ${style} style, afro music video, cinematic, Malawian`;
 
   try {
     const response = await fetch("https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev", {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${HF_TOKEN}`,
-        "Content-Type": "application/json"
-      },
+      headers: { "Authorization": `Bearer ${HF_TOKEN}`, "Content-Type": "application/json" },
       body: JSON.stringify({ inputs: prompt })
     });
 
     if (!response.ok) {
-      throw new Error("Model loading, retry in 20 sec...");
+      const err = await response.text();
+      throw new Error(err.substring(0,200));
     }
 
     const blob = await response.blob();
     const imageUrl = URL.createObjectURL(blob);
 
     resultArea.innerHTML = `
-      <p>✅ Mwala AI Generated!</p>
-      <p style="font-size:13px;">Prompt: ${song} (${style})</p>
+      <p>✅ Generated!</p>
       <img src="${imageUrl}" style="width:100%; border-radius:12px; border:2px solid #ff3b30;">
-      <p style="font-size:12px; color:#888; margin-top:10px;">This is AI-generated image. Next step we will convert it to moving video!</p>
-      <a href="${imageUrl}" download="mwala-ai.png" style="display:block; margin-top:10px; background:#ff3b30; padding:10px; border-radius:8px; color:white; text-decoration:none;">Download Image</a>
-      <button onclick="window.location.reload()" style="margin-top:10px;">Create Another</button>
+      <a href="${imageUrl}" download="mwala-ai.png" style="display:block; margin-top:10px; background:#ff3b30; padding:10px; border-radius:8px; color:white; text-decoration:none; text-align:center;">Download</a>
     `;
-
-  } catch (error) {
-    resultArea.innerHTML = `
-      <p style="color:orange;">⚠️ AI model is loading (first time takes 1 min). Please wait 20 seconds and click Generate again.</p>
-      <p style="font-size:12px; color:#888;">Error: ${error.message}</p>
-      <button onclick="generateVideo()">Retry Now</button>
-    `;
+  } catch (e) {
+    resultArea.innerHTML = `<p style="color:orange;">⚠️ Model is loading or token error. Wait 30s and retry.<br><small>${e.message}</small></p><button onclick="generateVideo()">Retry</button>`;
   }
+}
+
+// Auto-fill token if saved before
+window.onload = () => {
+  const saved = localStorage.getItem('hf_token');
+  if(saved) document.getElementById('hfToken').value = saved;
 }
